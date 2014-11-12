@@ -4,14 +4,19 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class MyActivity extends Activity {
 
+    public MyActivity(){
+        myActivity = this;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
+        tvScore =(TextView) findViewById(R.id.tvScore);
     }
 
 
@@ -22,5 +27,10 @@ public class MyActivity extends Activity {
         return true;
     }
 
+    private TextView tvScore;
+    private static MyActivity myActivity = null;
 
+    public static MyActivity getMyActivity() {
+        return myActivity;
+    }
 }

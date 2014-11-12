@@ -18,8 +18,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
 </LinearLayout>
-<con.bookthief.android_2048.GameView android:id="@+id/gameView"
+<com.bookthief.android_2048.GameView android:id="@+id/gameView"
     android:layout_width="fill_parent"
     android:layout_height="0dp"
-    android:layout_weight="1"></con.bookthief.android_2048.GameView>
+    android:layout_weight="1"></com.bookthief.android_2048.GameView>
 </LinearLayout>
