@@ -246,16 +246,16 @@ public class GameView extends GridLayout{
     private void SwipeRight(){
         if (canMoveRight()) {
             for (int col = 0; col < 4; col++) {
-                for (int row = 2; row >= 0; row--) {
+                for (int row = 0; row < 3; row++) {
                     if (cardMap[row][col].getNum() >= 0)
 
-                        for (int ver = row - 1; ver >=0; ver--) {
+                        for (int ver = row + 1; ver < 4; ver++) {
                             if (cardMap[ver][col].getNum() == 0 && noBlockVertical(col, row, ver)) {
-                                cardMap[row][col].setNum(cardMap[ver][col].getNum());
-                                cardMap[ver][col].setNum(0);
+                                cardMap[ver][col].setNum(cardMap[row][col].getNum());
+                                cardMap[row][col].setNum(0);
                             } else if (cardMap[ver][col].getNum() == cardMap[row][col].getNum() && noBlockVertical(col, row, ver)) {
-                                cardMap[row][col].setNum(cardMap[ver][col].getNum() * 2);
-                                cardMap[ver][col].setNum(0);
+                                cardMap[ver][col].setNum(cardMap[row][col].getNum() * 2);
+                                cardMap[row][col].setNum(0);
                             }
 
 
@@ -297,17 +297,17 @@ public class GameView extends GridLayout{
     private void SwipeDown(){
         if (canMoveDown()) {
             for (int row = 0; row < 4; row++) {
-                for (int col = 2; col >= 0; col--) {
+                for (int col = 0; col < 3; col++) {
                     if (cardMap[row][col].getNum() >= 0)
 
-                        for (int hor = col - 1; hor >= 0; hor--) {
+                        for (int hor = col + 1; hor < 4; hor++) {
                             if (cardMap[row][hor].getNum() == 0 && noBlockHorizontal(row, col, hor)) {
                             /*可以添加动画效果*/
-                                cardMap[row][col].setNum(cardMap[row][hor].getNum());
-                                cardMap[row][hor].setNum(0);
+                                cardMap[row][hor].setNum(cardMap[row][col].getNum());
+                                cardMap[row][col].setNum(0);
                             } else if (cardMap[row][hor].getNum() == cardMap[row][col].getNum() && noBlockHorizontal(row, col, hor)) {
-                                cardMap[row][col].setNum(cardMap[row][hor].getNum() * 2);
-                                cardMap[row][hor].setNum(0);
+                                cardMap[row][hor].setNum(cardMap[row][col].getNum() * 2);
+                                cardMap[row][col].setNum(0);
                             }
 
 
