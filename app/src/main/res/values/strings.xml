@@ -4,6 +4,6 @@
     <string name="app_name">android-2048</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="score">Score</string>
-
+    <string name="score">Score:</string>
+    <string name="btn">Restart</string>
 </resources>

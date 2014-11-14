@@ -1,6 +1,8 @@
 package com.bookthief.android_2048;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -42,7 +44,6 @@ public class GameView extends GridLayout{
      */
     private  Card[][] cardMap = new Card[4][4];
     private List<Point> emptyPoints = new ArrayList<Point>();
-
     /**
      * 主视图初始化
      */
@@ -65,18 +66,14 @@ public class GameView extends GridLayout{
                         if(Math.abs(offsetx) >Math.abs(offsety)) {
                             if (offsetx < -5) {
                                 SwipeLeft();
-                                System.out.print("L");
                             } else if (offsetx > 5) {
                                 SwipeRight();
-                                System.out.print("R");
                             }
                         }else {
                             if (offsety < -5) {
                                 SwipeUp();
-                                System.out.print("U");
                             }else if (offsety > 5) {
                                 SwipeDown();
-                                System.out.print("D");
                             }
 
                         }
@@ -123,6 +120,7 @@ public class GameView extends GridLayout{
          *  开启游戏
          */
         private void startGame(){
+            MyActivity.getMyActivity().cleaScore();
             for (int col= 0;col < 4;col++){
                 for (int row = 0;row < 4;row++){
                    cardMap[row][col].setNum(0);
@@ -133,6 +131,30 @@ public class GameView extends GridLayout{
             addRandomNum();
         }
 
+        /**
+         *  检查游戏是否结束
+         */
+        private  boolean checkComplete(){
+            for (int row = 0;row < 4;row++){
+                for (int col = 0;col < 4;col++)
+                    if (cardMap[col][row].getNum() == 0 ||
+                        (col > 0 && cardMap[col][row].equals(cardMap[col-1][row])) ||
+                        (col < 3 && cardMap[col][row].equals(cardMap[col+1][row])) ||
+                        (row > 0 && cardMap[col][row].equals(cardMap[col][row-1])) ||
+                        (row < 3 && cardMap[col][row].equals(cardMap[col][row+1]))){
+                        return false;
+                    }
+            }
+            new AlertDialog.Builder(getContext()).setTitle("你好").setMessage("游戏结束,您的得分是 "+ MyActivity.getMyActivity().getScore()+" ！").setPositiveButton("重来", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    startGame();
+                    // TODO Auto-generated method stub
+                }
+            }).show();
+            return true;
+        }
 
         /**
          *  生成随机数
@@ -160,14 +182,14 @@ public class GameView extends GridLayout{
      */
     private boolean noBlockHorizontal(int row,int col1,int col2){
         for (int i = col1 + 1;i < col2;i++)
-            if (cardMap[row][i].getNum() != 0)
+            if (cardMap[i][row].getNum() != 0)
                 return false;
         return true;
     }
 
     private boolean noBlockVertical(int col,int row1,int row2){
         for (int i = row1 + 1;i < row2;i++)
-            if (cardMap[i][col].getNum() != 0)
+            if (cardMap[col][i].getNum() != 0)
                 return false;
         return true;
     }
@@ -177,8 +199,8 @@ public class GameView extends GridLayout{
     private boolean canMoveLeft(){
      for (int row = 0;row < 4;row++){
          for (int col = 1;col < 4;col++){
-             if(cardMap[row][col].getNum() >= 0)
-                 if(cardMap[row][col-1].getNum()==0 ||cardMap[row][col-1].getNum()==cardMap[row][col].getNum())
+             if(cardMap[col][row].getNum() > 0)
+                 if(cardMap[col-1][row].getNum()==0 ||cardMap[col-1][row].getNum()==cardMap[col][row].getNum())
                      return true;
          }
      }
@@ -187,8 +209,8 @@ public class GameView extends GridLayout{
     private boolean canMoveRight(){
         for (int row = 0;row < 4;row++){
             for (int col = 2;col >= 0;col--){
-                if(cardMap[row][col].getNum() >= 0)
-                    if(cardMap[row][col+1].getNum()==0 ||cardMap[row][col+1].getNum()==cardMap[row][col].getNum())
+                if(cardMap[col][row].getNum() > 0)
+                    if(cardMap[col+1][row].getNum()==0 ||cardMap[col+1][row].getNum()==cardMap[col][row].getNum())
                         return true;
             }
         }
@@ -197,8 +219,8 @@ public class GameView extends GridLayout{
     private boolean canMoveUp(){
         for (int col = 0;col < 4;col++){
             for (int row = 1;row < 4;row++){
-                if(cardMap[row][col].getNum() >= 0)
-                    if(cardMap[row-1][col].getNum()==0 ||cardMap[row-1][col].getNum()==cardMap[row][col].getNum())
+                if(cardMap[col][row].getNum() > 0)
+                    if(cardMap[col][row-1].getNum()==0 ||cardMap[col][row-1].getNum()==cardMap[col][row].getNum())
                         return true;
             }
         }
@@ -207,8 +229,8 @@ public class GameView extends GridLayout{
     private boolean canMoveDown(){
         for (int col = 0;col < 4;col++){
             for (int row = 2;row >= 0;row--){
-                if(cardMap[row][col].getNum() >= 0)
-                    if(cardMap[row+1][col].getNum()==0 ||cardMap[row+1][col].getNum()==cardMap[row][col].getNum())
+                if(cardMap[col][row].getNum() > 0)
+                    if(cardMap[col][row+1].getNum()==0 ||cardMap[col][row+1].getNum()==cardMap[col][row].getNum())
                         return true;
             }
         }
@@ -221,103 +243,96 @@ public class GameView extends GridLayout{
 
     private void SwipeLeft(){
         if (canMoveLeft()) {
-            for (int col = 0; col < 4; col++) {
-                for (int row = 1; row < 4; row++) {
-                    if (cardMap[row][col].getNum() >= 0)
-
-                        for (int ver = 0; ver < row; ver++) {
-                            if (cardMap[ver][col].getNum() == 0 && noBlockVertical(col, ver, row)) {
-                                cardMap[ver][col].setNum(cardMap[row][col].getNum());
-                                cardMap[row][col].setNum(0);
-                            } else if (cardMap[ver][col].getNum() == cardMap[row][col].getNum() && noBlockVertical(col, ver, row)) {
-                                cardMap[ver][col].setNum(cardMap[row][col].getNum() * 2);
-                                cardMap[row][col].setNum(0);
+            for (int row = 0; row < 4; row++) {
+                for (int col = 1; col < 4; col++) {
+                    if (cardMap[col][row].getNum() >= 0)
+                        for (int hor = 0; hor < col; hor++) {
+                            if (cardMap[hor][row].getNum() == 0 && noBlockHorizontal(row, hor, col)) {
+                                cardMap[hor][row].setNum(cardMap[col][row].getNum());
+                                cardMap[col][row].setNum(0);
+                                break;
+                            } else if (cardMap[hor][row].getNum() == cardMap[col][row].getNum() && noBlockHorizontal(row, hor, col)) {
+                                cardMap[hor][row].setNum(cardMap[col][row].getNum() * 2);
+                                cardMap[col][row].setNum(0);
+                                MyActivity.getMyActivity().addScore(cardMap[hor][row].getNum());
+                                break;
                             }
-
-
                         }
-
                 }
             }
-
             addRandomNum();
         }
+        checkComplete();
     }
     private void SwipeRight(){
         if (canMoveRight()) {
-            for (int col = 0; col < 4; col++) {
-                for (int row = 0; row < 3; row++) {
-                    if (cardMap[row][col].getNum() >= 0)
-
-                        for (int ver = row + 1; ver < 4; ver++) {
-                            if (cardMap[ver][col].getNum() == 0 && noBlockVertical(col, row, ver)) {
-                                cardMap[ver][col].setNum(cardMap[row][col].getNum());
-                                cardMap[row][col].setNum(0);
-                            } else if (cardMap[ver][col].getNum() == cardMap[row][col].getNum() && noBlockVertical(col, row, ver)) {
-                                cardMap[ver][col].setNum(cardMap[row][col].getNum() * 2);
-                                cardMap[row][col].setNum(0);
+            for (int row = 0; row < 4; row++) {
+                for (int col = 2; col >= 0; col--) {
+                    if (cardMap[col][row].getNum() >= 0)
+                        for (int hor = 3; hor > col; hor--) {
+                            if (cardMap[hor][row].getNum() == 0 && noBlockHorizontal(row, col, hor)) {
+                                cardMap[hor][row].setNum(cardMap[col][row].getNum());
+                                cardMap[col][row].setNum(0);
+                                break;
+                            } else if (cardMap[hor][row].getNum() == cardMap[col][row].getNum() && noBlockHorizontal(row, col, hor)) {
+                                cardMap[hor][row].setNum(cardMap[col][row].getNum() * 2);
+                                cardMap[col][row].setNum(0);
+                                MyActivity.getMyActivity().addScore(cardMap[hor][row].getNum());
+                                break;
                             }
-
-
                         }
-
                 }
             }
-
             addRandomNum();
         }
+        checkComplete();
 
     }
     private void SwipeUp(){
         if (canMoveUp()) {
-            for (int row = 0; row < 4; row++) {
-                for (int col = 1; col < 4; col++) {
-                    if (cardMap[row][col].getNum() >= 0)
-
-                        for (int hor = 0; hor < col; hor++) {
-                            if (cardMap[row][hor].getNum() == 0 && noBlockHorizontal(row, hor, col)) {
-                            /*可以添加动画效果*/
-                                cardMap[row][hor].setNum(cardMap[row][col].getNum());
-                                cardMap[row][col].setNum(0);
-                            } else if (cardMap[row][hor].getNum() == cardMap[row][col].getNum() && noBlockHorizontal(row, hor, col)) {
-                                cardMap[row][hor].setNum(cardMap[row][col].getNum() * 2);
-                                cardMap[row][col].setNum(0);
+            for (int row = 1; row < 4; row++) {
+                for (int col = 0; col < 4; col++) {
+                    if (cardMap[col][row].getNum() >= 0)
+                        for (int ver = 0; ver < row; ver++) {
+                            if (cardMap[col][ver].getNum() == 0 && noBlockVertical(col, ver, row)) {
+                                cardMap[col][ver].setNum(cardMap[col][row].getNum());
+                                cardMap[col][row].setNum(0);
+                                break;
+                            } else if (cardMap[col][ver].getNum() == cardMap[col][row].getNum() && noBlockVertical(col, ver, row)) {
+                                cardMap[col][ver].setNum(cardMap[col][row].getNum() * 2);
+                                cardMap[col][row].setNum(0);
+                                MyActivity.getMyActivity().addScore(cardMap[col][ver].getNum());
+                                break;
                             }
-
-
                         }
-
                 }
             }
-
             addRandomNum();
-
         }
+        checkComplete();
     }
     private void SwipeDown(){
         if (canMoveDown()) {
-            for (int row = 0; row < 4; row++) {
-                for (int col = 0; col < 3; col++) {
-                    if (cardMap[row][col].getNum() >= 0)
-
-                        for (int hor = col + 1; hor < 4; hor++) {
-                            if (cardMap[row][hor].getNum() == 0 && noBlockHorizontal(row, col, hor)) {
-                            /*可以添加动画效果*/
-                                cardMap[row][hor].setNum(cardMap[row][col].getNum());
-                                cardMap[row][col].setNum(0);
-                            } else if (cardMap[row][hor].getNum() == cardMap[row][col].getNum() && noBlockHorizontal(row, col, hor)) {
-                                cardMap[row][hor].setNum(cardMap[row][col].getNum() * 2);
-                                cardMap[row][col].setNum(0);
+            for (int row = 2; row >= 0; row--) {
+                for (int col = 0; col < 4; col++) {
+                    if (cardMap[col][row].getNum() >= 0)
+                        for (int ver = 3; ver > row; ver--) {
+                            if (cardMap[col][ver].getNum() == 0 && noBlockVertical(col, row, ver)) {
+                                cardMap[col][ver].setNum(cardMap[col][row].getNum());
+                                cardMap[col][row].setNum(0);
+                                break;
+                            } else if (cardMap[col][ver].getNum() == cardMap[col][row].getNum() && noBlockVertical(col, row, ver)) {
+                                cardMap[col][ver].setNum(cardMap[col][row].getNum() * 2);
+                                cardMap[col][row].setNum(0);
+                                MyActivity.getMyActivity().addScore(cardMap[col][ver].getNum());
+                                break;
                             }
-
-
                         }
-
                 }
             }
-
             addRandomNum();
         }
+        checkComplete();
     }
 
         /**
